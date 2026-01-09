@@ -1,0 +1,454 @@
+.\dlib_venv\Scripts\Activate ==put this command in the terminal to run the virtual allways
+step1:install the python version 12
+step2:open the vs code 
+       and create new folder with the name of dlib_venu
+step 3:
+     for the new folder open a new terminal
+and command python -m venv dlib_venv
+step4:
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser 
+type this command in the terminal
+
+step 5:
+type this command in the terminal
+.\dlib_venv\Scripts\Activate
+step 6:
+type this command in the terminal
+pip install cmake  
+step 7:
+pip install .\dlib-19.24.99-cp312-cp312-win_amd64.whl
+type this command also in the terminal
+if it shows an error 
+download the dlib-19.24 manually
+step 8:
+after successfully installation of the dlib
+type this command in the terminal
+pip install dlib face_recognition scikit-learn  
+step 9:
+ pip install face_recognition scikit-learn 
+type this command in the terminal
+step 10:
+pip install opencv_python 
+put this command in the terminal
+step 11:
+delete the wheel which i sent
+step 12:
+in the root file create the src
+step13:
+inside the src create the 
+camera_test.py
+inside this put the below code:
+   import cv2
+
+cap = cv2.VideoCapture(0)  # 0 = default webcam
+while True:
+    ret, frame = cap.read()
+    if not ret:
+        print("Failed to grab frame")
+        break
+    
+    cv2.imshow("Camera", frame)
+
+    # press 'q' to quit
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
+
+cap.release()
+cv2.destroyAllWindows()
+step14:
+inside the camera_test.py
+put the below code in the terminal:
+ python src/camera_test.py   
+enter the q=stop the camera running
+step15:
+again in the root folder create the folder requirements.txt
+Step 16:
+again in the root folder create the README.md
+inside this put the below command:
+# Smart Selfie – Face Detection & Recognition Project
+
+## Overview
+Smart Selfie is a computer vision project that uses OpenCV, dlib, and face_recognition to perform real-time face detection, smile recognition, and age prediction.  
+The goal is to build a reliable pipeline that can capture live video, detect faces, preprocess images, and apply machine learning models for classification.
+
+## Features
+- Real-time webcam access with OpenCV  
+- Face detection using OpenCV Haar Cascades and dlib  
+- Image preprocessing (resizing, normalization, grayscale conversion)  
+- Dataset handling with augmentation and splitting  
+- Training-ready pipelines for smile detection and age prediction  
+
+## Project Structure
+Dlip_Vscode/
+│── .gitignore
+│── requirements.txt
+│── README.md
+│── src/
+│ ├── main.py # Entry point for the project
+│ ├── camera_test.py # Webcam testing script
+│ └── preprocessing.py # (future) image preprocessing utilities
+│── dlib_venv/ # Virtual environment (ignored in git)
+
+step 17:
+first create a repository in the GitHub
+name as Dlip_Vscode
+git init
+git remote add origin URL
+step 18:
+git add .
+git commit -m "Initial commit"
+git branch -M main
+git push -u origin main
+step 19:
+ echo "# Git ignore rules" > .gitignore 
+put this command in the terminal
+step20:
+ the gitignore is created
+ # Virtual environments
+dlib_venv/
+.venv/
+
+# VS Code settings
+.vscode/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Logs
+*.log
+
+# Build / wheel files
+*.whl
+it will avoid the above content
+step 21:
+git add .gitignore
+git commit -m "Update .gitignore rules"
+git push
+step 22:
+mkdir data
+mkdir data\smile
+mkdir data\age
+step 22:
+download the files what i Send
+step 23:
+extract them if it is 25MB put it in the smile folder
+step 24:
+extrct it in age folder
+step 25:
+create the test_dataset.py in the src
+put this below code in the dataset.py
+import cv2
+import os
+import numpy as np
+import csv
+
+# Paths
+smile_path = "E:\\infosys projects\\Dlip_Vscode\\data\\smile\\kaggle-genki4k\\smile"
+non_smile_path = "E:\\infosys projects\\Dlip_Vscode\\data\\smile\\kaggle-genki4k\\non_smile"
+age_path = "E:\\infosys projects\\Dlip_Vscode\\data\\age\\UTKFace"
+
+# List first 5 files from each (adjust if needed)
+smile_files = os.listdir(smile_path)[:5]
+non_smile_files = os.listdir(non_smile_path)[:5]
+age_files = os.listdir(age_path)[:5]
+
+print("Smile images:", smile_files)
+print("Non-Smile images:", non_smile_files)
+print("Age images:", age_files)
+
+# Resize + Label helper function
+def resize_and_label(img, label, size=(200, 200)):
+    img = cv2.resize(img, size)
+    cv2.putText(img, label, (10, 25), cv2.FONT_HERSHEY_SIMPLEX, 
+                0.7, (0, 255, 0), 2, cv2.LINE_AA)
+    return img
+
+# Function to load images safely and collect inventory
+def load_images_and_inventory(file_list, path, prefix):
+    imgs = []
+    inventory = []
+    for i, f in enumerate(file_list):
+        img_path = os.path.join(path, f)
+        img = cv2.imread(img_path)
+        if img is None:
+            print(f"Corrupted {prefix} image skipped: {f}")
+            continue
+        height, width, channels = img.shape
+        extension = os.path.splitext(f)[1]
+        inventory.append([f, prefix, extension, width, height, channels])
+        imgs.append(resize_and_label(img, f"{prefix} {i+1}"))
+    return imgs, inventory
+
+# Load images and collect inventory
+smile_imgs, smile_inventory = load_images_and_inventory(smile_files, smile_path, "Smile")
+non_smile_imgs, non_smile_inventory = load_images_and_inventory(non_smile_files, non_smile_path, "Non-Smile")
+age_imgs, age_inventory = load_images_and_inventory(age_files, age_path, "Age")
+
+# Stack vertically
+smile_stack = np.vstack(smile_imgs)
+non_smile_stack = np.vstack(non_smile_imgs)
+age_stack = np.vstack(age_imgs)
+
+# Stack side by side: Smile | Non-Smile | Age
+combined = np.hstack((smile_stack, non_smile_stack, age_stack))
+
+# Save the combined image
+output_path = "E:\\infosys projects\\Dlip_Vscode\\sample_combined.png"
+cv2.imwrite(output_path, combined)
+print(f"Combined image saved at: {output_path}")
+
+# Show result
+cv2.imshow("Smile | Non-Smile | Age", combined)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+
+# Combine all inventory
+all_inventory = smile_inventory + non_smile_inventory + age_inventory
+
+# Save dataset inventory to CSV
+with open("dataset_inventory.csv", "w", newline="") as f:
+    writer = csv.writer(f)
+    writer.writerow(["Filename", "Label", "Format", "Width", "Height", "Channels"])
+    writer.writerows(all_inventory)
+
+# Print summary
+print("\nDataset Inventory Summary:")
+print(f"Number of Smile images: {len(smile_inventory)}")
+print(f"Number of Non-Smile images: {len(non_smile_inventory)}")
+print(f"Number of Age images: {len(age_inventory)}")
+print("Dataset inventory saved as 'dataset_inventory.csv'")
+
+run this command once you fixed it  python test_dataset.py
+
+step 26:
+create cleaned_data folder in the root file
+in that create the smile and non smile folder as well as age folder
+step 27:
+create a file in the src with the name of test_dataset.py
+paste the below code in it
+code:import cv2
+import os
+import numpy as np
+import csv
+
+# Paths
+smile_path = "E:\\infosys projects\\Dlip_Vscode\\data\\smile\\kaggle-genki4k\\smile"
+non_smile_path = "E:\\infosys projects\\Dlip_Vscode\\data\\smile\\kaggle-genki4k\\non_smile"
+age_path = "E:\\infosys projects\\Dlip_Vscode\\data\\age\\UTKFace"
+
+# List first 5 files from each (adjust if needed)
+smile_files = os.listdir(smile_path)[:5]
+non_smile_files = os.listdir(non_smile_path)[:5]
+age_files = os.listdir(age_path)[:5]
+
+print("Smile images:", smile_files)
+print("Non-Smile images:", non_smile_files)
+print("Age images:", age_files)
+
+# Resize + Label helper function
+def resize_and_label(img, label, size=(200, 200)):
+    img = cv2.resize(img, size)
+    cv2.putText(img, label, (10, 25), cv2.FONT_HERSHEY_SIMPLEX, 
+                0.7, (0, 255, 0), 2, cv2.LINE_AA)
+    return img
+
+# Function to load images safely and collect inventory
+def load_images_and_inventory(file_list, path, prefix):
+    imgs = []
+    inventory = []
+    for i, f in enumerate(file_list):
+        img_path = os.path.join(path, f)
+        img = cv2.imread(img_path)
+        if img is None:
+            print(f"Corrupted {prefix} image skipped: {f}")
+            continue
+        height, width, channels = img.shape
+        extension = os.path.splitext(f)[1]
+        inventory.append([f, prefix, extension, width, height, channels])
+        imgs.append(resize_and_label(img, f"{prefix} {i+1}"))
+    return imgs, inventory
+
+# Load images and collect inventory
+smile_imgs, smile_inventory = load_images_and_inventory(smile_files, smile_path, "Smile")
+non_smile_imgs, non_smile_inventory = load_images_and_inventory(non_smile_files, non_smile_path, "Non-Smile")
+age_imgs, age_inventory = load_images_and_inventory(age_files, age_path, "Age")
+
+# Stack vertically
+smile_stack = np.vstack(smile_imgs)
+non_smile_stack = np.vstack(non_smile_imgs)
+age_stack = np.vstack(age_imgs)
+
+# Stack side by side: Smile | Non-Smile | Age
+combined = np.hstack((smile_stack, non_smile_stack, age_stack))
+
+# Save the combined image
+output_path = "E:\\infosys projects\\Dlip_Vscode\\sample_combined.png"
+cv2.imwrite(output_path, combined)
+print(f"Combined image saved at: {output_path}")
+
+# Show result
+cv2.imshow("Smile | Non-Smile | Age", combined)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+
+# Combine all inventory
+all_inventory = smile_inventory + non_smile_inventory + age_inventory
+
+# Save dataset inventory to CSV
+with open("dataset_inventory.csv", "w", newline="") as f:
+    writer = csv.writer(f)
+    writer.writerow(["Filename", "Label", "Format", "Width", "Height", "Channels"])
+    writer.writerows(all_inventory)
+
+# Print summary
+print("\nDataset Inventory Summary:")
+print(f"Number of Smile images: {len(smile_inventory)}")
+print(f"Number of Non-Smile images: {len(non_smile_inventory)}")
+print(f"Number of Age images: {len(age_inventory)}")
+print("Dataset inventory saved as 'dataset_inventory.csv'")
+
+then change the path smile and non smile and age
+ 
+step 28:
+ ceate a new file check_preprocessed.py in the src folder
+and run this below codes in it 
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Load datasets
+X_smile = np.load("E:\\infosys projects\\Dlip_Vscode\\preprocessed\\X_smile.npy")
+y_smile = np.load("E:\\infosys projects\\Dlip_Vscode\\preprocessed\\y_smile.npy")
+
+X_age = np.load("E:\\infosys projects\\Dlip_Vscode\\preprocessed\\X_age.npy")
+y_age = np.load("E:\\infosys projects\\Dlip_Vscode\\preprocessed\\y_age.npy")
+
+print("Smile dataset:", X_smile.shape, y_smile.shape)
+print("Age dataset:", X_age.shape, y_age.shape)
+
+# --- Show some Smile / Non-Smile samples ---
+plt.figure(figsize=(10, 4))
+for i in range(5):
+    plt.subplot(2, 5, i + 1)
+    plt.imshow(X_smile[i].squeeze(), cmap="gray")
+    plt.title("Smile" if y_smile[i] == 1 else "Non-Smile")
+    plt.axis("off")
+
+# --- Show some Age samples ---
+for i in range(5):
+    plt.subplot(2, 5, i + 6)
+    plt.imshow(X_age[i].squeeze(), cmap="gray")
+    plt.title(f"Age: {y_age[i]}")
+    plt.axis("off")
+
+plt.suptitle("Smile vs Age Dataset Samples", fontsize=14)
+plt.tight_layout()
+plt.show(block=False)  # don’t block the script
+plt.pause(3)           # show for 3 seconds
+plt.close()            # auto-close window
+run this below command:
+pip install matplotlib
+step 29:
+create a file in the src
+check_smile_labels.py
+put this code in it 
+  import numpy as np
+
+X_smile = np.load("E:\\infosys projects\\Dlip_Vscode\\preprocessed\\X_smile.npy")
+y_smile = np.load("E:\\infosys projects\\Dlip_Vscode\\preprocessed\\y_smile.npy")
+
+print("Unique labels in smile dataset:", set(y_smile))
+print("Count of smile (1):", (y_smile == 1).sum())
+print("Count of non-smile (0):", (y_smile == 0).sum())
+step 30:
+split_dataset.py
+create a file in the src with the above name
+import numpy as np
+from tensorflow.keras.utils import to_categorical
+import os
+
+# Path to splits folder
+split_path = "E:\\infosys projects\\Dlip_Vscode\\splits"
+
+# --- Load Smile Dataset ---
+X_smile_train = np.load(os.path.join(split_path, "X_smile_train.npy"))
+y_smile_train = np.load(os.path.join(split_path, "y_smile_train.npy"))
+X_smile_val = np.load(os.path.join(split_path, "X_smile_val.npy"))
+y_smile_val = np.load(os.path.join(split_path, "y_smile_val.npy"))
+X_smile_test = np.load(os.path.join(split_path, "X_smile_test.npy"))
+y_smile_test = np.load(os.path.join(split_path, "y_smile_test.npy"))
+
+# One-hot encode labels (0 = non-smile, 1 = smile)
+y_smile_train = to_categorical(y_smile_train, num_classes=2)
+y_smile_val = to_categorical(y_smile_val, num_classes=2)
+y_smile_test = to_categorical(y_smile_test, num_classes=2)
+
+print("Smile dataset:")
+print("Train:", X_smile_train.shape, y_smile_train.shape)
+print("Val:", X_smile_val.shape, y_smile_val.shape)
+print("Test:", X_smile_test.shape, y_smile_test.shape)
+
+# --- Load Age Dataset ---
+X_age_train = np.load(os.path.join(split_path, "X_age_train.npy"))
+y_age_train = np.load(os.path.join(split_path, "y_age_train.npy"))
+X_age_val = np.load(os.path.join(split_path, "X_age_val.npy"))
+y_age_val = np.load(os.path.join(split_path, "y_age_val.npy"))
+X_age_test = np.load(os.path.join(split_path, "X_age_test.npy"))
+y_age_test = np.load(os.path.join(split_path, "y_age_test.npy"))
+
+print("\nAge dataset:")
+print("Train:", X_age_train.shape, y_age_train.shape)
+print("Val:", X_age_val.shape, y_age_val.shape)
+print("Test:", X_age_test.shape, y_age_test.shape)
+run it
+step 31:
+then create a dataloader.py in the src
+and place the below code in it
+import numpy as np
+import os
+from tensorflow.keras.utils import to_categorical
+
+# ✅ Correct path
+split_path = "E:\\infosys projects\\Dlip_Vscode\\splits"
+
+# ---------------- Smile Dataset ----------------
+X_smile_train = np.load(os.path.join(split_path, "X_smile_train.npy"))
+y_smile_train = np.load(os.path.join(split_path, "y_smile_train.npy"))
+
+X_smile_val = np.load(os.path.join(split_path, "X_smile_val.npy"))
+y_smile_val = np.load(os.path.join(split_path, "y_smile_val.npy"))
+
+X_smile_test = np.load(os.path.join(split_path, "X_smile_test.npy"))
+y_smile_test = np.load(os.path.join(split_path, "y_smile_test.npy"))
+
+# One-hot encode smile labels (0 = non-smile, 1 = smile)
+y_smile_train = to_categorical(y_smile_train, num_classes=2)
+y_smile_val = to_categorical(y_smile_val, num_classes=2)
+y_smile_test = to_categorical(y_smile_test, num_classes=2)
+
+print("✅ Smile Train:", X_smile_train.shape, y_smile_train.shape)
+print("✅ Smile Val:", X_smile_val.shape, y_smile_val.shape)
+print("✅ Smile Test:", X_smile_test.shape, y_smile_test.shape)
+
+
+# ---------------- Age Dataset ----------------
+X_age_train = np.load(os.path.join(split_path, "X_age_train.npy"))
+y_age_train = np.load(os.path.join(split_path, "y_age_train.npy"))
+
+X_age_val = np.load(os.path.join(split_path, "X_age_val.npy"))
+y_age_val = np.load(os.path.join(split_path, "y_age_val.npy"))
+
+X_age_test = np.load(os.path.join(split_path, "X_age_test.npy"))
+y_age_test = np.load(os.path.join(split_path, "y_age_test.npy"))
+
+# Age is regression (no one-hot encoding needed)
+print("✅ Age Train:", X_age_train.shape, y_age_train.shape)
+print("✅ Age Val:", X_age_val.shape, y_age_val.shape)
+print("✅ Age Test:", X_age_test.shape, y_age_test.shape)
+
+
+
+
+  
+
+ 
