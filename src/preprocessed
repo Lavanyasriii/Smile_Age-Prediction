@@ -1,0 +1,33 @@
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Load datasets
+X_smile = np.load("C:\\Infosys springboard\\preprocessed\\X_smile.npy")
+y_smile = np.load("C:\\Infosys springboard\\preprocessed\\y_smile.npy")
+
+X_age = np.load("C:\\Infosys springboard\\preprocessed\\X_age.npy")
+y_age = np.load("C:\\Infosys springboard\\preprocessed\\y_age.npy")
+
+print("Smile dataset:", X_smile.shape, y_smile.shape)
+print("Age dataset:", X_age.shape, y_age.shape)
+
+# --- Show some Smile / Non-Smile samples ---
+plt.figure(figsize=(10, 4))
+for i in range(5):
+    plt.subplot(2, 5, i + 1)
+    plt.imshow(X_smile[i].squeeze(), cmap="gray")
+    plt.title("Smile" if y_smile[i] == 1 else "Non-Smile")
+    plt.axis("off")
+
+# --- Show some Age samples ---
+for i in range(5):
+    plt.subplot(2, 5, i + 6)
+    plt.imshow(X_age[i].squeeze(), cmap="gray")
+    plt.title(f"Age: {y_age[i]}")
+    plt.axis("off")
+
+plt.suptitle("Smile vs Age Dataset Samples", fontsize=14)
+plt.tight_layout()
+plt.show(block=False)  # don’t block the script
+plt.pause(10)           # show for 10 seconds
+plt.close()           # auto-close window
